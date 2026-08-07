@@ -6,7 +6,7 @@
   
   <br />
 
-  [![VeilBid CI](https://github.com/thisisouvik/VeilBid/actions/workflows/ci.yml/badge.svg)](https://github.com/thisisouvik/VeilBid/actions/workflows/ci.yml)
+  [![VeilBid CI](https://github.com/SUMAN967-GHOSH/VeilBid/actions/workflows/ci.yml/badge.svg)](https://github.com/SUMAN967-GHOSH/VeilBid/actions/workflows/ci.yml)
   
   ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
   ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
@@ -19,7 +19,7 @@
 
 ## 🔗 Quick Links
 
-*   🌐 **Live Deployed App**: [zk-auction-dun.vercel.app](https://zk-auction-dun.vercel.app/)
+*   🌐 **Live Deployed App**: [veil-bid.vercel.app](https://veil-bid.vercel.app/)
 *   📜 **Deployed Preview Contract**: [`fd6bdc97815...c5cb5`](https://explorer.1am.xyz/contract/fd6bdc97815e8c3a9de7c20e1bfae641409321761684f2dbeb1746f0f34c5cb5?network=preview)
 *   🎥 **Demo Video**: [Watch on Google Drive](https://drive.google.com/file/d/1s2vG85VgwU9I50-nKdo1P39mvH9C8S10/view?usp=sharing)
 

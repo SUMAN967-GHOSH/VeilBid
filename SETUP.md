@@ -19,7 +19,7 @@ Now that your wallet is ready, let's run the application.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/thisisouvik/VeilBid.git
+git clone https://github.com/SUMAN967-GHOSH/VeilBid.git
 cd VeilBid
 
 # 2. Install Node.js dependencies
