@@ -1,8 +1,8 @@
 /**
- * scripts/deploy.ts — Preprod Deployment Script for ZKAuction
+ * scripts/deploy.ts — Preview Deployment Script for ZKAuction
  *
  * This script:
- *  1. Connects to Midnight Preprod via Midnight.js SDK
+ *  1. Connects to Midnight Preview via Midnight.js SDK
  *  2. Compiles & loads the contract (must run `npm run compile:contract` first)
  *  3. Deploys the contract with a specified reserve price + duration
  *  4. Saves the contract address to .env.local and prints it
@@ -54,7 +54,7 @@ async function main() {
   const args = parseArgs();
 
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║   ZKAuction — Midnight Preprod Deployment Script        ║');
+  console.log('║   ZKAuction — Midnight Preview Deployment Script        ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 
   console.log(`📡 Network:          ${args.network}`);
@@ -120,7 +120,7 @@ async function main() {
   console.log('   ✅ Provider config ready\n');
 
   // ── Step 4: Deploy contract ──────────────────────────────────────────────
-  console.log('🚀 Step 4: Deploying contract to Midnight Preprod...');
+  console.log('🚀 Step 4: Deploying contract to Midnight Preview...');
   console.log('   (This may take 30–90 seconds — ZK proof being generated locally)\n');
 
   try {
@@ -164,7 +164,7 @@ async function main() {
     // For now, this deploys the contract structure and shows the flow.
 
     console.log('\n   ℹ️  NOTE: Full automated deployment requires the Midnight CLI wallet.');
-    console.log('   See the PREPROD DEPLOYMENT GUIDE below for manual steps.\n');
+    console.log('   See the PREVIEW DEPLOYMENT GUIDE below for manual steps.\n');
 
     // ── Step 5: Save results ───────────────────────────────────────────────
     console.log('📝 Step 5: Saving deployment info...');
@@ -205,7 +205,7 @@ function printManualDeploymentGuide(
 ) {
   console.log('\n');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('  📖 PREPROD DEPLOYMENT GUIDE — Step by Step');
+  console.log('  📖 PREVIEW DEPLOYMENT GUIDE — Step by Step');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
   console.log('Your auction parameters are ready. Follow these steps:\n');
@@ -216,7 +216,7 @@ function printManualDeploymentGuide(
   console.log('  → Request tNIGHT tokens (takes ~1 minute)\n');
 
   console.log('STEP 2: Open your 1AM wallet browser extension');
-  console.log('  → Make sure it\'s set to "Midnight Preprod" network');
+  console.log('  → Make sure it\'s set to "Midnight Preview" network');
   console.log('  → You should see tNIGHT balance\n');
 
   console.log('STEP 3: Open the ZKAuction app');
@@ -238,17 +238,13 @@ function printManualDeploymentGuide(
   console.log('    NEXT_PUBLIC_DEPLOYED_CONTRACT=mn1q...\n');
 
   console.log('STEP 6: Verify on-chain');
-  console.log('  → Open: https://midnight.network/devtools/preprod');
+  console.log('  → Open: https://midnight.network/devtools/preview');
   console.log('  → Paste your contract address');
   console.log('  → You should see the auction state\n');
 
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('  Your Auction Configuration (saved to .seller-config.json)');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`  Reserve price:     ${args.reserveNight} tNIGHT`);
-  console.log(`  Reserve (µNIGHT):  ${reservePriceMicro}`);
-  console.log(`  Salt (hex):        ${salt.toString('hex').slice(0, 32)}...`);
-  console.log(`  Item fingerprint:  ${itemHash.toString('hex')}`);
+  console.log('══════════════════════════════════════════════════════════════════');
   console.log(`  Duration:          ${args.durationBlocks} blocks`);
   console.log('');
   console.log('  ⚠️  Keep .seller-config.json safe — you NEED the salt');
