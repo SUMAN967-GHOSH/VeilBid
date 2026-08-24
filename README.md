@@ -6,7 +6,7 @@
   
   <br />
 
-  [![VeilBid CI](https://github.com/SUMAN967-GHOSH/VeilBid/actions/workflows/ci.yml/badge.svg)](https://github.com/SUMAN967-GHOSH/VeilBid/actions/workflows/ci.yml)
+  [![VeilBid CI](https://github.com/SUMAN967-GHOSH/VeilBid/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SUMAN967-GHOSH/VeilBid/actions/workflows/ci.yml)
   
   ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
   ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
