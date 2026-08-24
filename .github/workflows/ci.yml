@@ -27,6 +27,8 @@ jobs:
 
       - name: Setup Midnight Compact Compiler
         uses: midnightntwrk/setup-compact-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compile contracts
         run: npm run compile:contract
