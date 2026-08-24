@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Midnight Compact Compiler
+        uses: midnightntwrk/setup-compact-action@v1
+
       - name: Compile contracts
         run: npm run compile:contract
 
