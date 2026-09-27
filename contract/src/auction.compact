@@ -223,6 +223,7 @@ export circuit settle(): [] {
   // ── Auction must be configured and still open
   assert(status == AuctionStatus.OPEN, "Auction already settled or expired");
   assert(auction_end_block > 0, "Auction not configured");
+  assert(block_number() > auction_end_block, "Auction has not yet ended");
 
   // ── Verify the reserve commitment is correct
   // The seller provides reserve_price() and commitment_salt() as witnesses.
