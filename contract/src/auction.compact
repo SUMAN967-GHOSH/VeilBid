@@ -274,3 +274,15 @@ export circuit withdrawExpired(): [] {
   highest_bid    = 0;
   highest_bidder = disclose(pad(32, ""));
 }
+
+// ── Circuit 5: cancelAuction ────────────────────────────────
+// Called by the seller to cancel the auction before it expires.
+// Only possible if the auction is still OPEN.
+export circuit cancelAuction(): [] {
+  assert(
+    seller == disclose(persistentHash<Bytes<32>>(local_secret_key())),
+    "Only the seller can cancel the auction"
+  );
+  assert(status == AuctionStatus.OPEN, "Auction is not open");
+  status = disclose(AuctionStatus.EXPIRED);
+}
