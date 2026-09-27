@@ -155,8 +155,8 @@ export circuit createAuction(
   // The reserve_price() and commitment_salt() witnesses are called here
   // They run on the user's machine, inside the proof server.
   // Only the COMMITMENT (hash) goes on-chain — not the price or salt.
-  const commitment = persistentHash<Bytes<32>>(
-    commitment_salt() // Using salt as the domain key, price as value
+  const commitment = persistentHash<[Uint<64>, Bytes<32>]>(
+    [reserve_price(), commitment_salt()]
   );
 
   // ── Write public state to ledger
@@ -225,7 +225,7 @@ export circuit settle(): [] {
   // ── Verify the reserve commitment is correct
   // The seller provides reserve_price() and commitment_salt() as witnesses.
   // The circuit recomputes the commitment and checks it matches on-chain.
-  const recomputed = persistentHash<Bytes<32>>(commitment_salt());
+  const recomputed = persistentHash<[Uint<64>, Bytes<32>]>([reserve_price(), commitment_salt()]);
   assert(recomputed == reserve_commitment, "Invalid reserve commitment: wrong price or salt");
 
   // ── Determine outcome based on whether reserve was met
