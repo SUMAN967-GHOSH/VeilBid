@@ -183,6 +183,8 @@ export circuit placeBid(bid_amount: Uint<64>): [] {
   // In production, we compare to current_block_number().
   // For now, we check against a non-zero end block as proxy.
   assert(auction_end_block > 0, "Auction not yet configured");
+  // Enforce the auction hasn't expired yet
+  assert(block_number() <= auction_end_block, "Auction has expired");
 
   // ── Bid must strictly exceed the current highest bid
   assert(bid_amount > highest_bid, "Bid must exceed current highest bid");
