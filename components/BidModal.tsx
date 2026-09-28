@@ -119,6 +119,22 @@ export function BidModal({ isOpen, isPending, state, contractAddress, onClose, o
                 disabled={isPending}
                 autoFocus
               />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ padding: '4px 8px', fontSize: 12, flex: 1 }}
+                  onClick={() => setAmount((Math.max(currentBidNight, 0) + 10).toString())}
+                  disabled={isPending}
+                >+10 tNIGHT</button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  style={{ padding: '4px 8px', fontSize: 12, flex: 1 }}
+                  onClick={() => setAmount((Math.max(currentBidNight, 0) + 50).toString())}
+                  disabled={isPending}
+                >+50 tNIGHT</button>
+              </div>
               {error && (
                 <p style={{ fontSize: 12, color: 'var(--red-400)', marginTop: 6 }}>{error}</p>
               )}
