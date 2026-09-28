@@ -235,10 +235,12 @@ export function useWallet(): WalletHookState {
   // Auto-reconnect on mount
   useEffect(() => {
     const checkExistingConnection = async () => {
+      const wasConnected = localStorage.getItem('veilbid:wallet-connected');
+      if (!wasConnected) return;
+
       const found = getRawWallet();
       if (!found) return;
       try {
-        // Only auto-reconnect if already enabled
         if (typeof found.wallet.isEnabled === 'function') {
           const already = await found.wallet.isEnabled();
           if (!already) return;
@@ -261,7 +263,7 @@ export function useWallet(): WalletHookState {
       }
     };
 
-    const t = setTimeout(checkExistingConnection, 1000);
+    const t = setTimeout(checkExistingConnection, 500);
     return () => clearTimeout(t);
   }, []);
 
@@ -311,6 +313,7 @@ export function useWallet(): WalletHookState {
       setCoinPublicKey(cpk);
       setIsConnected(true);
       setDebugInfo(null);
+      localStorage.setItem('veilbid:wallet-connected', 'true');
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Wallet connection failed';
@@ -347,6 +350,7 @@ export function useWallet(): WalletHookState {
     setError(null);
     setIsPendingError(false);
     setDebugInfo(null);
+    localStorage.removeItem('veilbid:wallet-connected');
   }, []);
 
   return {
