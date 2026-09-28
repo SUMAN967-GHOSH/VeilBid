@@ -26,5 +26,6 @@ This project has **high feasibility** because it leverages an established modern
 ## 5. Project Status
 - ✅ Smart Contracts written, tested, and compiled.
 - ✅ Frontend built and integrated with Midnight SDK.
-- ✅ Deployed to Midnight Preview Network.
-- ✅ E2E Testing passing.
+- ✅ Deployed to Midnight **PREPROD** Network.
+- ✅ E2E Testing passing (17/17 test cases).
+- ✅ Contract: [`ac616d0ed7625c97c6188df5253077ce140ac64d73390ae925631caf4e3533ba`](https://explorer.1am.xyz/contract/ac616d0ed7625c97c6188df5253077ce140ac64d73390ae925631caf4e3533ba)
