@@ -10,16 +10,33 @@ export default function DashboardPage() {
   const [createdContracts, setCreatedContracts] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load created contracts from local storage
-    const stored = localStorage.getItem('veilbid:seller-contracts') || localStorage.getItem('zkauction:seller-contracts');
-    if (stored) {
+    // Load created contracts from API and local storage
+    const loadAuctions = async () => {
+      let stored: string[] = [];
       try {
-        setCreatedContracts(JSON.parse(stored));
+        const local = localStorage.getItem('veilbid:seller-contracts') || localStorage.getItem('zkauction:seller-contracts');
+        if (local) stored = JSON.parse(local);
       } catch (e) {
         console.error('Failed to parse seller contracts', e);
       }
-    }
-  }, []);
+
+      if (wallet.address) {
+        try {
+          const res = await fetch(`/api/auctions?deployer=${wallet.address}`);
+          const data = await res.json();
+          if (data.auctions) {
+            const apiContracts = data.auctions.map((a: any) => a.contractAddress);
+            stored = Array.from(new Set([...stored, ...apiContracts]));
+          }
+        } catch (e) {
+          console.error('Failed to fetch user auctions', e);
+        }
+      }
+      setCreatedContracts(stored);
+    };
+
+    loadAuctions();
+  }, [wallet.address]);
 
   return (
     <>
@@ -97,7 +114,7 @@ export default function DashboardPage() {
             </div>
             <div className="stat-card glass">
               <div className="stat-label text-emerald-400">Network</div>
-              <div className="stat-value text-2xl mt-2">Midnight Preview</div>
+              <div className="stat-value text-2xl mt-2">Midnight Preprod</div>
             </div>
             <div className="stat-card glass">
               <div className="stat-label text-pink-400">Your Auctions</div>
@@ -115,7 +132,7 @@ export default function DashboardPage() {
             
             {createdContracts.length === 0 ? (
               <div className="glass p-10 text-center rounded-2xl border-dashed border-2 border-slate-700/50 bg-slate-900/20">
-                <p className="text-slate-400 mb-4">You haven't deployed any private auctions yet.</p>
+                <p className="text-slate-400 mb-4">You haven&apos;t deployed any private auctions yet.</p>
                 <Link href="/auctions" className="btn btn-ghost">Create your first auction</Link>
               </div>
             ) : (

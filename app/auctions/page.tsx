@@ -29,12 +29,16 @@ const DEMO_AUCTION: AuctionState = {
 
 const DEMO_ADDRESS = 'mn1qzka2uc3xs8dkp9f0l3m7h6a4n8s2vr7jq5e1t';
 
+import { ErrorBoundary }                  from '@/components/ErrorBoundary';
+
 // ─── Root page (wrapped in providers) ────────────────────────────────────────
 export default function Home() {
   return (
-    <ToastProvider>
-      <AuctionPage />
-    </ToastProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <AuctionPage />
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
 
@@ -134,9 +138,22 @@ function AuctionPage() {
 
   useEffect(() => {
     if (wallet.connector) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadAuctions();
     }
   }, [wallet.connector, loadAuctions]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const loadAddr = params.get('load');
+    if (loadAddr && loadAddr !== lookupAddress) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLookupAddress(loadAddr);
+      setTimeout(() => {
+        document.getElementById('load-auction-btn')?.click();
+      }, 500);
+    }
+  }, []);
 
   // ── Create auction ─────────────────────────────────────────────────────────
   const handleCreate = useCallback(async (data: CreateAuctionFormData) => {
@@ -178,7 +195,7 @@ function AuctionPage() {
         <div>
           Contract:{' '}
           <a
-            href={`https://explorer.1am.xyz/address/${address}?network=preview`}
+            href={`https://explorer.1am.xyz/address/${address}?network=preprod`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--teal-400)', textDecoration: 'underline' }}
@@ -216,7 +233,7 @@ function AuctionPage() {
         <div>
           Tx:{' '}
           <a
-            href={`https://explorer.1am.xyz/tx/${result.txHash}?network=preview`}
+            href={`https://explorer.1am.xyz/tx/${result.txHash}?network=preprod`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--teal-400)', textDecoration: 'underline' }}
@@ -430,6 +447,15 @@ function AuctionPage() {
 
         {/* Auctions grid */}
         <section aria-label="Active auctions" style={{ marginBottom: '80px' }}>
+          {auctions.length === 0 && !loadingAuctions ? (
+            <div style={{ textAlign: 'center', padding: '64px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px dashed rgba(255,255,255,0.1)' }}>
+              <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>No Auctions Found</h3>
+              <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>There are currently no auctions matching your criteria.</p>
+              {!wallet.isConnected && (
+                <button className="btn btn-primary" onClick={wallet.connect}>Connect Wallet to Start</button>
+              )}
+            </div>
+          ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
             {auctions
               .filter(a => filter === 'ALL' || a.state.status === filter)
@@ -467,6 +493,7 @@ function AuctionPage() {
               );
             })}
           </div>
+          )}
         </section>
 
         {/* No Privacy Model section here anymore */}
