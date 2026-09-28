@@ -205,21 +205,21 @@ function printManualDeploymentGuide(
 ) {
   console.log('\n');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('  📖 PREVIEW DEPLOYMENT GUIDE — Step by Step');
+  console.log('  📖 PREPROD DEPLOYMENT GUIDE — Step by Step');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
   console.log('Your auction parameters are ready. Follow these steps:\n');
 
   console.log('STEP 1: Get tNIGHT from the faucet');
-  console.log('  → Open: https://faucet.midnight.network/');
-  console.log('  → Connect your 1AM wallet');
+  console.log('  → Open: https://midnight-tmnight-preprod.nethermind.dev/');
+  console.log('  → Enter your unshielded address');
   console.log('  → Request tNIGHT tokens (takes ~1 minute)\n');
 
   console.log('STEP 2: Open your 1AM wallet browser extension');
-  console.log('  → Make sure it\'s set to "Midnight Preview" network');
+  console.log('  → Make sure it\'s set to "Midnight Preprod" network');
   console.log('  → You should see tNIGHT balance\n');
 
-  console.log('STEP 3: Open the ZKAuction app');
+  console.log('STEP 3: Open the VeilBid app');
   console.log('  → Run: npm run dev');
   console.log('  → Open: http://localhost:3000');
   console.log('  → Click "Connect Wallet" → approve in 1AM wallet\n');
@@ -234,11 +234,10 @@ function printManualDeploymentGuide(
   console.log('STEP 5: Copy the contract address');
   console.log('  → After deployment, a contract address appears');
   console.log('  → It looks like: mn1q...');
-  console.log('  → Copy it and save to .env.local as:');
-  console.log('    NEXT_PUBLIC_DEPLOYED_CONTRACT=mn1q...\n');
+  console.log('  → The UI will automatically save it to your dashboard\n');
 
   console.log('STEP 6: Verify on-chain');
-  console.log('  → Open: https://midnight.network/devtools/preview');
+  console.log('  → Open: https://preprod.midnightexplorer.com/');
   console.log('  → Paste your contract address');
   console.log('  → You should see the auction state\n');
 
