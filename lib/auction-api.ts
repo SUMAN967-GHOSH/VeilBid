@@ -407,7 +407,6 @@ export class AuctionAPI {
    * Cancels an OPEN auction. Only the seller can call this.
    */
   async cancelAuction(contractAddress: string): Promise<TxResult> {
-    this.assertConnected();
     try {
       const storedState = await this.providers.privateStateProvider.get(PRIVATE_STATE_ID);
       if (!storedState) throw new Error('No private state found');

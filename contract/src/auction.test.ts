@@ -436,7 +436,7 @@ describe('VeilBid — Private Reserve Auction', () => {
   describe('Phase 0 — Environment verification (kept for CI)', () => {
     it('test environment is Node v22+', () => {
       expect(typeof process.version).toBe('string');
-      expect(process.version).toMatch(/^v22/);
+      expect(process.version).toMatch(/^v(22|24)/);
     });
 
     it('Midnight SDK packages are importable', async () => {
