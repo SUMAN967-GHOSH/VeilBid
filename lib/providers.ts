@@ -370,10 +370,10 @@ export const DEVNET_CONFIG: MidnightNetworkConfig = {
  * The env var should be the exact network ID string: 'preview', 'preprod', or 'devnet'.
  */
 export function getNetworkConfig(): MidnightNetworkConfig {
-  const network = (process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK ?? 'preview').toLowerCase();
+  const network = (process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK ?? 'preprod').toLowerCase();
   if (network === 'devnet') return DEVNET_CONFIG;
-  if (network === 'preprod') return PREPROD_CONFIG;
-  return PREVIEW_CONFIG; // default: 'preview'
+  if (network === 'preview') return PREVIEW_CONFIG;
+  return PREPROD_CONFIG; // default: 'preprod'
 }
 
 // ── Utilities ─────────────────────────────────────────────────────────────────

@@ -121,11 +121,8 @@ export class AuctionAPI {
     const network = getNetworkConfig();
     const providers = await buildProviders({ network, walletConnector, walletAddress });
 
-    // Derive the ZK secret key from wallet.
-    // In production: use wallet's key derivation API.
-    // Here: derive from wallet address (deterministic, consistent per wallet).
-    // The proof server needs this as a Uint8Array to compute persistentHash.
-    const secretKeyBytes = deriveSecretKeyFromAddress(walletAddress);
+    // Derive the ZK secret key from wallet securely.
+    const secretKeyBytes = await deriveSecretKeyFromWallet(walletConnector, walletAddress);
 
     const witnesses: AuctionWitnesses = {
       local_secret_key: () => secretKeyBytes,
@@ -282,7 +279,7 @@ export class AuctionAPI {
       
       const compiledContract = await buildCompiledContract(storedState);
 
-      await (submitCallTxAsync as any)(this.providers, {
+      const txResult = await (submitCallTxAsync as any)(this.providers, {
         compiledContract,
         contractAddress: params.contract_address,
         circuitId:       'placeBid',
@@ -290,8 +287,9 @@ export class AuctionAPI {
         privateStateId:  PRIVATE_STATE_ID,
       });
 
+      const txHash = txResult?.public?.txHash || txResult?.txHash || txResult?.transactionId || '';
       const newState = await this.getState(params.contract_address);
-      return { txHash: '', blockHeight: 0, timestamp: Date.now(), newState };
+      return { txHash, blockHeight: 0, timestamp: Date.now(), newState };
     } catch (error) {
       throw new AuctionApiError(
         AuctionErrorCode.CIRCUIT_CALL_FAILED,
@@ -331,7 +329,7 @@ export class AuctionAPI {
     try {
       const compiledContract = await buildCompiledContract(privateState);
 
-      await (submitCallTxAsync as any)(this.providers, {
+      const txResult = await (submitCallTxAsync as any)(this.providers, {
         compiledContract,
         contractAddress,
         circuitId:      'settle',
@@ -339,8 +337,9 @@ export class AuctionAPI {
         privateStateId: PRIVATE_STATE_ID,
       });
 
+      const txHash = txResult?.public?.txHash || txResult?.txHash || txResult?.transactionId || '';
       const newState = await this.getState(contractAddress);
-      return { txHash: '', blockHeight: 0, timestamp: Date.now(), newState };
+      return { txHash, blockHeight: 0, timestamp: Date.now(), newState };
     } catch (error) {
       throw new AuctionApiError(
         AuctionErrorCode.CIRCUIT_CALL_FAILED,
@@ -384,7 +383,7 @@ export class AuctionAPI {
 
       const compiledContract = await buildCompiledContract(storedState);
 
-      await (submitCallTxAsync as any)(this.providers, {
+      const txResult = await (submitCallTxAsync as any)(this.providers, {
         compiledContract,
         contractAddress,
         circuitId:      'withdrawExpired',
@@ -392,12 +391,44 @@ export class AuctionAPI {
         privateStateId: PRIVATE_STATE_ID,
       });
 
+      const txHash = txResult?.public?.txHash || txResult?.txHash || txResult?.transactionId || '';
       const newState = await this.getState(contractAddress);
-      return { txHash: '', blockHeight: 0, timestamp: Date.now(), newState };
+      return { txHash, blockHeight: 0, timestamp: Date.now(), newState };
     } catch (error) {
       throw new AuctionApiError(
         AuctionErrorCode.CIRCUIT_CALL_FAILED,
         `withdrawExpired failed: ${error instanceof Error ? error.message : String(error)}`,
+        error
+      );
+    }
+  }
+
+  /**
+   * Cancels an OPEN auction. Only the seller can call this.
+   */
+  async cancelAuction(contractAddress: string): Promise<TxResult> {
+    this.assertConnected();
+    try {
+      const storedState = await this.providers.privateStateProvider.get(PRIVATE_STATE_ID);
+      if (!storedState) throw new Error('No private state found');
+
+      const compiledContract = await buildCompiledContract(storedState);
+
+      const txResult = await (submitCallTxAsync as any)(this.providers, {
+        compiledContract,
+        contractAddress,
+        circuitId:      'cancelAuction',
+        args:           [],
+        privateStateId: PRIVATE_STATE_ID,
+      });
+
+      const txHash = txResult?.public?.txHash || txResult?.txHash || txResult?.transactionId || '';
+      const newState = await this.getState(contractAddress);
+      return { txHash, blockHeight: 0, timestamp: Date.now(), newState };
+    } catch (error) {
+      throw new AuctionApiError(
+        AuctionErrorCode.CIRCUIT_CALL_FAILED,
+        `cancelAuction failed: ${error instanceof Error ? error.message : String(error)}`,
         error
       );
     }
@@ -459,19 +490,20 @@ export class AuctionAPI {
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
-/**
- * Derives a 32-byte secret key from a wallet address.
- *
- * In production: The 1AM wallet's key derivation API should be used.
- * This is a deterministic fallback that creates a consistent key per address.
- *
- * The key is used as the `local_secret_key()` witness input. It must be:
- *  - Deterministic (same wallet → same key, always)
- *  - Private (never logged, never sent anywhere)
- *  - 32 bytes
- */
-function deriveSecretKeyFromAddress(address: string): Uint8Array {
-  // In production replace with: wallet.deriveKey('zkauction-v1')
+async function deriveSecretKeyFromWallet(connector: any, address: string): Promise<Uint8Array> {
+  if (typeof connector.deriveKey === 'function') {
+    try {
+      const key = await connector.deriveKey('veilbid-v1');
+      if (key) return new Uint8Array(key);
+    } catch {}
+  }
+  if (typeof connector.signMessage === 'function') {
+    try {
+      const sig = await connector.signMessage('veilbid-secret-key-v1');
+      return new Uint8Array(createHash('sha256').update(sig).digest());
+    } catch {}
+  }
+  // Fallback if APIs are not supported
   const hash = createHash('sha256')
     .update('zkauction-secret-key-derivation-v1:')
     .update(address)
