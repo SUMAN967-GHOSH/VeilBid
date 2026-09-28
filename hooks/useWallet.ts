@@ -41,13 +41,13 @@ function getRawWallet(): { wallet: any; key: string } | null {
   if (!midnight || typeof midnight !== 'object') return null;
 
   const allKeys = Object.keys(midnight);
-  console.log('[ZKAuction] window.midnight keys:', allKeys);
+  console.log('[VeilBid] window.midnight keys:', allKeys);
 
   // Try priority keys first
   for (const key of PRIORITY_KEYS) {
     if (midnight[key] && typeof midnight[key] === 'object') {
-      console.log(`[ZKAuction] Found wallet at window.midnight['${key}']`);
-      console.log(`[ZKAuction] Methods available:`, Object.keys(midnight[key]));
+      console.log(`[VeilBid] Found wallet at window.midnight['${key}']`);
+      console.log(`[VeilBid] Methods available:`, Object.keys(midnight[key]));
       return { wallet: midnight[key], key };
     }
   }
@@ -55,8 +55,8 @@ function getRawWallet(): { wallet: any; key: string } | null {
   // Fallback: grab first non-null object key
   for (const key of allKeys) {
     if (midnight[key] && typeof midnight[key] === 'object') {
-      console.log(`[ZKAuction] Fallback: using window.midnight['${key}']`);
-      console.log(`[ZKAuction] Methods available:`, Object.keys(midnight[key]));
+      console.log(`[VeilBid] Fallback: using window.midnight['${key}']`);
+      console.log(`[VeilBid] Methods available:`, Object.keys(midnight[key]));
       return { wallet: midnight[key], key };
     }
   }
@@ -70,13 +70,13 @@ function getRawWallet(): { wallet: any; key: string } | null {
  */
 async function connectToWallet(wallet: any, key: string): Promise<MidnightWalletConnector> {
   const methods = Object.keys(wallet).filter(k => typeof wallet[k] === 'function');
-  console.log(`[ZKAuction] wallet['${key}'] methods:`, methods);
+  console.log(`[VeilBid] wallet['${key}'] methods:`, methods);
 
   // Try standard dApp connector API first
   if (typeof wallet.enable === 'function') {
-    console.log('[ZKAuction] Using .enable()');
+    console.log('[VeilBid] Using .enable()');
     const result = await wallet.enable();
-    console.log('[ZKAuction] Raw result of .enable():', result);
+    console.log('[VeilBid] Raw result of .enable():', result);
     try {
       const allProps = [];
       let obj = result;
@@ -84,7 +84,7 @@ async function connectToWallet(wallet: any, key: string): Promise<MidnightWallet
         allProps.push(...Object.getOwnPropertyNames(obj));
         obj = Object.getPrototypeOf(obj);
       }
-      console.log('[ZKAuction] All prototype properties of enable result:', [...new Set(allProps)]);
+      console.log('[VeilBid] All prototype properties of enable result:', [...new Set(allProps)]);
     } catch (e) {
       console.error(e);
     }
@@ -96,12 +96,12 @@ async function connectToWallet(wallet: any, key: string): Promise<MidnightWallet
     
     // Let's also check if it returns a string (maybe the address?)
     if (typeof result === 'string') {
-      console.log('[ZKAuction] .enable() returned a string, possibly address:', result);
+      console.log('[VeilBid] .enable() returned a string, possibly address:', result);
       return { address: () => result } as any;
     }
 
     // Otherwise, .enable() just unlocked the wallet; the wallet object itself IS the connector
-    console.log('[ZKAuction] .enable() returned an object without connector methods, using wallet itself as connector');
+    console.log('[VeilBid] .enable() returned an object without connector methods, using wallet itself as connector');
     
     try {
       const allPropsW = [];
@@ -110,7 +110,7 @@ async function connectToWallet(wallet: any, key: string): Promise<MidnightWallet
         allPropsW.push(...Object.getOwnPropertyNames(objW));
         objW = Object.getPrototypeOf(objW);
       }
-      console.log('[ZKAuction] All prototype properties of wallet object:', [...new Set(allPropsW)]);
+      console.log('[VeilBid] All prototype properties of wallet object:', [...new Set(allPropsW)]);
     } catch (e) {}
 
     return wallet as MidnightWalletConnector;
@@ -118,11 +118,11 @@ async function connectToWallet(wallet: any, key: string): Promise<MidnightWallet
 
   // Try .connect()
   if (typeof wallet.connect === 'function') {
-    console.log('[ZKAuction] Using .connect()');
+    console.log('[VeilBid] Using .connect()');
     // Pass the EXACT network ID string — must match what the 1AM wallet expects.
     // Set NEXT_PUBLIC_MIDNIGHT_NETWORK in .env.local to 'preview', 'preprod', or 'devnet'.
     const networkId = (process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK ?? 'preview').toLowerCase();
-    console.log('[ZKAuction] Connecting to network:', networkId);
+    console.log('[VeilBid] Connecting to network:', networkId);
     const result = await wallet.connect(networkId);
     if (result && typeof result === 'object') return result;
     return result;
@@ -130,25 +130,25 @@ async function connectToWallet(wallet: any, key: string): Promise<MidnightWallet
 
   // Try .requestAccounts()
   if (typeof wallet.requestAccounts === 'function') {
-    console.log('[ZKAuction] Using .requestAccounts()');
+    console.log('[VeilBid] Using .requestAccounts()');
     return await wallet.requestAccounts();
   }
 
   // Try .getConnector()
   if (typeof wallet.getConnector === 'function') {
-    console.log('[ZKAuction] Using .getConnector()');
+    console.log('[VeilBid] Using .getConnector()');
     return await wallet.getConnector();
   }
 
   // Try .api() — some wallets expose this
   if (typeof wallet.api === 'function') {
-    console.log('[ZKAuction] Using .api()');
+    console.log('[VeilBid] Using .api()');
     return await wallet.api();
   }
 
   // If wallet object itself is the connector (has address / state methods)
   if (typeof wallet.address === 'function' || typeof wallet.balances === 'function' || typeof wallet.state === 'function') {
-    console.log('[ZKAuction] Wallet object IS the connector');
+    console.log('[VeilBid] Wallet object IS the connector');
     return wallet as MidnightWalletConnector;
   }
 
@@ -187,7 +187,7 @@ async function getAddress(conn: any): Promise<string | null> {
         if (result) return result;
         throw new Error(`getShieldedAddresses returned: ${JSON.stringify(rawRes, (k, v) => typeof v === 'bigint' ? v.toString() : v)}`);
       } catch (e: any) {
-        console.warn('[ZKAuction] Wallet API Error:', e.message);
+        console.warn('[VeilBid] Wallet API Error:', e.message);
       }
     }
     if (typeof conn.getUnshieldedAddress === 'function') {
@@ -200,7 +200,7 @@ async function getAddress(conn: any): Promise<string | null> {
     }
     if (conn.address && typeof conn.address === 'string') return conn.address;
   } catch (e) {
-    console.warn('[ZKAuction] Could not get address:', e);
+    console.warn('[VeilBid] Could not get address:', e);
   }
   return null;
 }
@@ -275,13 +275,13 @@ export function useWallet(): WalletHookState {
     try {
       // Log everything in window.midnight for diagnosis
       const mid = (window as any)?.midnight;
-      console.log('[ZKAuction] window.midnight:', mid);
+      console.log('[VeilBid] window.midnight:', mid);
       if (mid) {
         for (const k of Object.keys(mid)) {
           const obj = mid[k];
-          console.log(`[ZKAuction] .${k} (${typeof obj}):`, obj);
+          console.log(`[VeilBid] .${k} (${typeof obj}):`, obj);
           if (obj && typeof obj === 'object') {
-            console.log(`[ZKAuction]   keys of .${k}:`, Object.keys(obj));
+            console.log(`[VeilBid]   keys of .${k}:`, Object.keys(obj));
           }
         }
       }
@@ -317,7 +317,7 @@ export function useWallet(): WalletHookState {
 
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Wallet connection failed';
-      console.error('[ZKAuction] Connection error:', err);
+      console.error('[VeilBid] Connection error:', err);
       // Detect the "already pending" error specifically so the UI can show a retry button
       const isPending = msg.toLowerCase().includes('already pending');
       setIsPendingError(isPending);

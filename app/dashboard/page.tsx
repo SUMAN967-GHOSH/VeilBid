@@ -14,7 +14,7 @@ export default function DashboardPage() {
     const loadAuctions = async () => {
       let stored: string[] = [];
       try {
-        const local = localStorage.getItem('veilbid:seller-contracts') || localStorage.getItem('zkauction:seller-contracts');
+        const local = localStorage.getItem('veilbid:seller-contracts') || localStorage.getItem('VeilBid:seller-contracts');
         if (local) stored = JSON.parse(local);
       } catch (e) {
         console.error('Failed to parse seller contracts', e);

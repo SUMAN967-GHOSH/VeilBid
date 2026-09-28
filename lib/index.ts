@@ -1,5 +1,5 @@
 /**
- * lib/index.ts — Barrel export for the ZKAuction API layer
+ * lib/index.ts — Barrel export for the VeilBid API layer
  *
  * Import everything from here in your Next.js components:
  *   import { AuctionAPI, connectWallet, AuctionStatus } from '@/lib';

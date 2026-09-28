@@ -1,5 +1,5 @@
 /**
- * scripts/deploy.ts — Preview Deployment Script for ZKAuction
+ * scripts/deploy.ts — Preview Deployment Script for VeilBid
  *
  * This script:
  *  1. Connects to Midnight Preview via Midnight.js SDK
@@ -44,8 +44,8 @@ function parseArgs() {
   return {
     reserveNight:   Number(get('--reserve',  '1000')),
     durationBlocks: BigInt(get('--duration', '200')!),
-    itemDescription: get('--item', 'ZKAuction Demo Item — Midnight Preview') as string,
-    network:        get('--network', process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK ?? 'preview') as string,
+    itemDescription: get('--item', 'VeilBid Asset — Midnight Preprod') as string,
+    network:        get('--network', process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK ?? 'preprod') as string,
   };
 }
 
@@ -54,7 +54,7 @@ async function main() {
   const args = parseArgs();
 
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║   ZKAuction — Midnight Preview Deployment Script        ║');
+  console.log('║   VeilBid — Midnight Preprod Deployment Script           ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 
   console.log(`📡 Network:          ${args.network}`);
@@ -141,7 +141,7 @@ async function main() {
 
     // Hash item description
     const itemHash = crypto.createHash('sha256')
-      .update(args.itemDescription ?? 'ZKAuction Demo Item')
+      .update(args.itemDescription ?? 'VeilBid Demo Item')
       .digest();
 
     // Private state for deployment

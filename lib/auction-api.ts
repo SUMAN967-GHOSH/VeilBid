@@ -70,7 +70,7 @@ import { createHash, randomBytes } from 'crypto';
 // ── Private State ID ──────────────────────────────────────────────────────────
 // Used as the key when storing/retrieving private state from the provider.
 // Each deployed contract gets its own private state bucket.
-const PRIVATE_STATE_ID = 'zkauction-private-state-v1';
+const PRIVATE_STATE_ID = 'VeilBid-private-state-v1';
 
 // ── Witness Implementation Interface ─────────────────────────────────────────
 // These TypeScript functions implement the Compact `witness` declarations.
@@ -111,7 +111,7 @@ export class AuctionAPI {
     // The env var NEXT_PUBLIC_MIDNIGHT_NETWORK should be 'preview', 'preprod', or 'devnet'.
     const networkId = (process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK ?? 'preview').toLowerCase();
     setNetworkId(networkId);
-    console.log('[ZKAuction] Set network ID to:', networkId);
+    console.log('[VeilBid] Set network ID to:', networkId);
 
     // Get wallet address — the 1AM wallet may return address as a property (string)
     // OR as an async function. We handle both shapes here.
@@ -133,7 +133,7 @@ export class AuctionAPI {
 
   // ── Deploy: Deploy a new auction contract ──────────────────────────────────
   /**
-   * Deploys a new ZKAuction contract to Midnight Preprod.
+   * Deploys a new VeilBid contract to Midnight Preprod.
    * Only the SELLER calls this. A new contract address is returned.
    *
    * Internally this calls:
@@ -504,7 +504,7 @@ async function deriveSecretKeyFromWallet(connector: any, address: string): Promi
   }
   // Fallback if APIs are not supported
   const hash = createHash('sha256')
-    .update('zkauction-secret-key-derivation-v1:')
+    .update('VeilBid-secret-key-derivation-v1:')
     .update(address)
     .digest();
   return new Uint8Array(hash);
@@ -662,7 +662,7 @@ async function resolveAddress(connector: any): Promise<string> {
 
     if (typeof connector.getShieldedAddresses === 'function') {
       const rawRes = await connector.getShieldedAddresses();
-      console.log('[ZKAuction] getShieldedAddresses raw:', JSON.stringify(rawRes, (k, v) => typeof v === 'bigint' ? v.toString() : v));
+      console.log('[VeilBid] getShieldedAddresses raw:', JSON.stringify(rawRes, (k, v) => typeof v === 'bigint' ? v.toString() : v));
       const addr = extractAddress(rawRes);
       if (addr) return addr;
     }
@@ -681,10 +681,10 @@ async function resolveAddress(connector: any): Promise<string> {
     }
 
     // Last resort — return 'unknown' and let extractKeysFromConnectorOrAddress handle it
-    console.warn('[ZKAuction] Could not resolve wallet address. Connector:', connector);
+    console.warn('[VeilBid] Could not resolve wallet address. Connector:', connector);
     return 'unknown';
   } catch (e) {
-    console.warn('[ZKAuction] Error resolving address:', e);
+    console.warn('[VeilBid] Error resolving address:', e);
     return 'unknown';
   }
 }
@@ -741,7 +741,7 @@ async function buildCompiledContract(privateState: any): Promise<any> {
 
   // Build using the CompiledContract pipeline (imperative style to avoid TS generic issues)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const step1: any = CompiledContract.make('zkauction-v1', ContractClass);
+  const step1: any = CompiledContract.make('VeilBid-v1', ContractClass);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const step2: any = (CompiledContract.withWitnesses as any)(step1, witnesses);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

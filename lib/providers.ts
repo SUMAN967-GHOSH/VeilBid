@@ -193,7 +193,7 @@ export async function buildProviders(
   // The wallet returns { shieldedCoinPublicKey, shieldedEncryptionPublicKey }
   // These are passed directly to the SDK — no decoding needed.
   const shieldedAddress = await walletConnector.getShieldedAddresses();
-  console.log('[ZKAuction] shieldedAddress:', JSON.stringify(shieldedAddress));
+  console.log('[VeilBid] shieldedAddress:', JSON.stringify(shieldedAddress));
 
   // ── Provider 5: zkConfigProvider ─────────────────────────────────────────
   // FetchZkConfigProvider fetches ZK key files via simple HTTP:
@@ -230,7 +230,7 @@ export async function buildProviders(
     balanceTx: async (tx: any): Promise<any> => {
       const txHex = Array.from(tx.serialize() as Uint8Array)
         .map((b: number) => b.toString(16).padStart(2, '0')).join('');
-      console.log('[ZKAuction] balanceUnsealedTransaction called');
+      console.log('[VeilBid] balanceUnsealedTransaction called');
       const balanced = await walletConnector.balanceUnsealedTransaction(txHex);
       if (!balanced?.tx) throw new Error(`balanceUnsealedTransaction returned invalid result: ${JSON.stringify(balanced)}`);
       const { Transaction } = await import('@midnight-ntwrk/ledger-v8');
@@ -245,7 +245,7 @@ export async function buildProviders(
     submitTx: async (tx: any): Promise<any> => {
       const txHex = Array.from(tx.serialize() as Uint8Array)
         .map((b: number) => b.toString(16).padStart(2, '0')).join('');
-      console.log('[ZKAuction] submitTransaction called');
+      console.log('[VeilBid] submitTransaction called');
       const result = await walletConnector.submitTransaction(txHex);
       if (typeof result === 'string' && result) return result;
       if (result?.transactionId) return result.transactionId;
@@ -279,7 +279,7 @@ export async function buildProviders(
 // Stores private state in browser localStorage so it survives page refreshes.
 // Handles serialization of BigInt and Uint8Array.
 function buildLocalStoragePrivateStateProvider() {
-  const PREFIX = 'zkauction_private_state_';
+  const PREFIX = 'VeilBid_private_state_';
   let currentContractAddress = 'unscoped';
 
   const replacer = (key: string, value: any) => {
@@ -391,11 +391,11 @@ async function extractKeysFromConnectorOrAddress(connector: any, walletAddress: 
     //    The wallet returns { shieldedAddress, shieldedCoinPublicKey, shieldedEncryptionPublicKey }
     if (typeof connector.getShieldedAddresses === 'function') {
       const res = await connector.getShieldedAddresses();
-      console.log('[ZKAuction] extractKeys: getShieldedAddresses =>', JSON.stringify(res, null, 2));
+      console.log('[VeilBid] extractKeys: getShieldedAddresses =>', JSON.stringify(res, null, 2));
 
       // Single object response (1AM wallet on preview / preprod)
       if (res && res.shieldedCoinPublicKey && res.shieldedEncryptionPublicKey) {
-        console.log('[ZKAuction] extractKeys: using shieldedCoinPublicKey / shieldedEncryptionPublicKey directly');
+        console.log('[VeilBid] extractKeys: using shieldedCoinPublicKey / shieldedEncryptionPublicKey directly');
         return {
           coinPublicKey: res.shieldedCoinPublicKey,
           encryptionPublicKey: res.shieldedEncryptionPublicKey,
@@ -449,7 +449,7 @@ async function extractKeysFromConnectorOrAddress(connector: any, walletAddress: 
       encryptionPublicKey: shielded.encryptionPublicKeyString(),
     };
   } catch (err: any) {
-    console.error('[ZKAuction] Failed to extract public keys:', err);
+    console.error('[VeilBid] Failed to extract public keys:', err);
     throw new Error('Failed to extract public keys from wallet address: ' + (err.message || String(err)));
   }
 }

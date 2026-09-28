@@ -1,5 +1,5 @@
 /**
- * lib/types.ts — Shared TypeScript Types for ZKAuction
+ * lib/types.ts — Shared TypeScript Types for VeilBid
  *
  * These types mirror the Compact contract's ledger state and provide
  * a clean, strongly-typed interface for the frontend and API layer.
