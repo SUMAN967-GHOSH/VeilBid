@@ -95,9 +95,23 @@ export function AuctionCard({
           >
             {itemDescription || 'Mystery Asset'}
           </h2>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-            Contract: {truncHex(contractAddress)}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+              Contract: {truncHex(contractAddress)}
+            </p>
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/auctions?load=${contractAddress}`);
+              }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--teal-400)', padding: 4 }}
+              title="Copy link to auction"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* ── Financials (Vertical Stack) ── */}
