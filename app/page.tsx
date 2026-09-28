@@ -10,6 +10,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -49,7 +50,7 @@ export default function Home() {
             style={{ display: 'inline-flex', marginBottom: 24, fontSize: 13, padding: '8px 16px', fontWeight: 600 }}
           >
             <span className="pulse-dot" />
-            Live on Midnight Preview
+            Live on Midnight Preprod
           </div>
 
           <h1
