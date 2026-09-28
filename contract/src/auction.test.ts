@@ -47,11 +47,13 @@ function deriveKey(secretKey: Buffer): Buffer {
     .digest();
 }
 
-// Simulates the commitment = persistentHash(salt)
-// Reserve price is kept private; only the salt's hash is stored
-function makeCommitment(salt: Buffer): Buffer {
+// Simulates the commitment = persistentHash([price, salt])
+function makeCommitment(price: bigint, salt: Buffer): Buffer {
+  const priceBuffer = Buffer.alloc(8);
+  priceBuffer.writeBigUInt64BE(price);
   return crypto.createHash('sha256')
     .update(Buffer.from('midnight-commitment-v1:'))
+    .update(priceBuffer)
     .update(salt)
     .digest();
 }
@@ -91,7 +93,7 @@ function circuitCreateAuction(
   }
 
   // Reserve price is used to build the commitment — but stays private
-  const commitment = makeCommitment(salt); // price proven privately
+  const commitment = makeCommitment(reservePrice, salt); // price proven privately
 
   return {
     ...ledger,
@@ -148,7 +150,7 @@ function circuitSettle(
   }
 
   // Verify commitment: recompute from private witnesses
-  const recomputed = makeCommitment(salt);
+  const recomputed = makeCommitment(reservePrice, salt);
   if (!recomputed.equals(ledger.reserve_commitment)) {
     throw new Error('Invalid reserve commitment: wrong price or salt');
   }
@@ -183,6 +185,21 @@ function circuitWithdrawExpired(
     highest_bid: 0n,
     highest_bidder: Buffer.alloc(32),
   };
+}
+
+// Simulates the cancelAuction() circuit
+function circuitCancelAuction(
+  ledger: AuctionLedger,
+  sellerKey: Buffer
+): AuctionLedger {
+  if (!ledger.seller.equals(deriveKey(sellerKey))) {
+    throw new Error('Only the seller can cancel the auction');
+  }
+  if (ledger.status !== AuctionStatus.OPEN) {
+    throw new Error('Auction is not open');
+  }
+
+  return { ...ledger, status: AuctionStatus.EXPIRED };
 }
 
 // ── Test Data ───────────────────────────────────────────────────────────────
@@ -391,6 +408,27 @@ describe('VeilBid — Private Reserve Auction', () => {
       expect(() => {
         circuitWithdrawExpired(ledger, EVIL_KEY);
       }).toThrow('Only seller or highest bidder can withdraw');
+    });
+  });
+
+  // ── TEST 7: Cancel Auction ──────────────────────────────────────────────
+  describe('Test 7: Cancel Auction', () => {
+    it('seller can cancel an OPEN auction', () => {
+      let ledger = createLedger(SELLER_KEY);
+      ledger = circuitCreateAuction(ledger, SELLER_KEY, 100n, RESERVE_PRICE, SALT, ITEM_HASH);
+      expect(ledger.status).toBe(AuctionStatus.OPEN);
+
+      ledger = circuitCancelAuction(ledger, SELLER_KEY);
+      expect(ledger.status).toBe(AuctionStatus.EXPIRED);
+    });
+
+    it('non-seller cannot cancel the auction', () => {
+      let ledger = createLedger(SELLER_KEY);
+      ledger = circuitCreateAuction(ledger, SELLER_KEY, 100n, RESERVE_PRICE, SALT, ITEM_HASH);
+
+      expect(() => {
+        circuitCancelAuction(ledger, EVIL_KEY);
+      }).toThrow('Only the seller can cancel the auction');
     });
   });
 
