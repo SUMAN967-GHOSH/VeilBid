@@ -14,20 +14,7 @@ import { BidModal }                     from '@/components/BidModal';
 import type { AuctionState }            from '@/lib/types';
 import { AuctionStatus }                from '@/lib/types';
 
-// ─── Demo auction state (used when wallet not connected or contract not deployed) ──
-// This lets you see the full UI immediately without any blockchain setup.
-const DEMO_AUCTION: AuctionState = {
-  seller:             'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
-  reserve_commitment: 'ff8a2c4e91b03d7f5a64c2187e39d501b84a96f0c3e27d1a94b580e6c2f1793d',
-  highest_bid:        1_200_000n, // 1.2 tNIGHT
-  highest_bidder:     'd4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5',
-  auction_end_block:  99250n,
-  status:             AuctionStatus.OPEN,
-  bid_count:          3,
-  item_hash:          '3a7bd3e2360a3d29eea436fcfb7e44c735d117c42d1c1835420b6b9942dd4f1b',
-};
 
-const DEMO_ADDRESS = 'mn1qzka2uc3xs8dkp9f0l3m7h6a4n8s2vr7jq5e1t';
 
 import { ErrorBoundary }                  from '@/components/ErrorBoundary';
 
