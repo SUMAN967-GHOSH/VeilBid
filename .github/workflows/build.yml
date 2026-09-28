@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: "Next.js Production Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js production bundle
+        run: npm run build
+        env:
+          NEXT_PUBLIC_MIDNIGHT_NETWORK: preprod
+          NEXT_PUBLIC_NODE_WS_URL: wss://rpc.preprod.midnight.network/ws
+          NEXT_PUBLIC_INDEXER_URI: https://indexer.preprod.midnight.network/api/v4/graphql
+          NEXT_PUBLIC_INDEXER_WS_URI: wss://indexer.preprod.midnight.network/api/v4/graphql
+          NEXT_PUBLIC_PROOF_SERVER_URI: https://proving.preprod.midnight.network
+          DATABASE_URL: postgres://dummy:dummy@localhost:5432/dummy
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: .next/
+          retention-days: 3
