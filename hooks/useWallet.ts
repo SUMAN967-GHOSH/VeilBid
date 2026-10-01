@@ -18,6 +18,7 @@ export interface WalletHookState {
   address: string | null;
   coinPublicKey: string | null;  // <--- ADDED THIS
   shortAddress: string | null;
+  currentBlock: bigint | null;   // <--- ADDED THIS for Web2 expiry guardrails
   error: string | null;
   connector: MidnightWalletConnector | null;
   connect: () => Promise<void>;
@@ -227,10 +228,38 @@ export function useWallet(): WalletHookState {
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string | null>(null);
   const [connector, setConnector] = useState<MidnightWalletConnector | null>(null);
+  const [currentBlock, setCurrentBlock] = useState<bigint | null>(null);
 
   const shortAddress = address
     ? `${address.slice(0, 8)}…${address.slice(-6)}`
     : null;
+
+  // Poll for current block height from the indexer
+  useEffect(() => {
+    let mounted = true;
+    const fetchBlock = async () => {
+      try {
+        const res = await fetch('https://indexer.preprod.midnight.network/api/v4/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: 'query { block { height } }' })
+        });
+        const data = await res.json();
+        if (mounted && data?.data?.block?.height) {
+          setCurrentBlock(BigInt(data.data.block.height));
+        }
+      } catch (err) {
+        console.warn('[VeilBid] Failed to fetch current block', err);
+      }
+    };
+
+    fetchBlock();
+    const interval = setInterval(fetchBlock, 15000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   // Auto-reconnect on mount
   useEffect(() => {
@@ -360,6 +389,7 @@ export function useWallet(): WalletHookState {
     address,
     coinPublicKey,
     shortAddress,
+    currentBlock,
     error,
     debugInfo,
     connector,

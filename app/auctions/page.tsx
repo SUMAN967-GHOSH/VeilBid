@@ -476,6 +476,7 @@ function AuctionPage() {
                     pendingWithdraw === address ||
                     (pendingBid && bidTarget?.address === address)
                   }
+                  currentBlock={wallet.currentBlock}
                 />
               );
             })}
