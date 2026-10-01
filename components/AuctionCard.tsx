@@ -18,6 +18,7 @@ interface AuctionCardProps {
   onSettle?: () => void;
   onWithdraw?: () => void;
   isActionPending?: boolean;
+  currentBlock?: bigint | null;
 }
 
 export function AuctionCard({
@@ -29,6 +30,7 @@ export function AuctionCard({
   onSettle,
   onWithdraw,
   isActionPending = false,
+  currentBlock = null,
 }: AuctionCardProps) {
   const isOpen     = state.status === AuctionStatus.OPEN;
   const isSettled  = state.status === AuctionStatus.SETTLED;
@@ -200,10 +202,11 @@ export function AuctionCard({
               id={`bid-btn-${contractAddress.slice(0, 8)}`}
               className="btn btn-primary"
               onClick={onBid}
-              disabled={isActionPending}
+              disabled={isActionPending || (currentBlock !== null && currentBlock >= state.auction_end_block)}
               style={{ width: '100%', padding: '16px', fontSize: 16, fontWeight: 700, borderRadius: 14 }}
+              title={currentBlock !== null && currentBlock >= state.auction_end_block ? "Auction has expired" : ""}
             >
-              {isActionPending ? <><span className="spinner" />Submitting Proof…</> : <>Place Sealed Bid</>}
+              {isActionPending ? <><span className="spinner" />Submitting Proof…</> : (currentBlock !== null && currentBlock >= state.auction_end_block ? <>Auction Expired</> : <>Place Sealed Bid</>)}
             </button>
           )}
 
@@ -212,10 +215,11 @@ export function AuctionCard({
               id={`settle-btn-${contractAddress.slice(0, 8)}`}
               className="btn btn-primary"
               onClick={onSettle}
-              disabled={isActionPending}
+              disabled={isActionPending || (currentBlock !== null && currentBlock < state.auction_end_block)}
               style={{ width: '100%', padding: '16px', fontSize: 16, fontWeight: 700, borderRadius: 14 }}
+              title={currentBlock !== null && currentBlock < state.auction_end_block ? "Auction is still running" : ""}
             >
-              {isActionPending ? <><span className="spinner" />Settling…</> : <>Reveal & Settle Auction</>}
+              {isActionPending ? <><span className="spinner" />Settling…</> : (currentBlock !== null && currentBlock < state.auction_end_block ? <>Waiting for Expiry ({state.auction_end_block - currentBlock} blocks left)</> : <>Reveal & Settle Auction</>)}
             </button>
           )}
 
